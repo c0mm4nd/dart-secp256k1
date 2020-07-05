@@ -6,9 +6,10 @@ secp256k1 refers to the parameters of the elliptic curve used in Bitcoin's publi
 
 library secp256k1 uses pure dart and its basic types to represent all matters:
 
+```
 PrivateKey => BigInt
 PublickKey => List<BigInt>(2)
-
+```
 
 A simple usage example:
 

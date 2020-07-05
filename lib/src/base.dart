@@ -83,7 +83,7 @@ List<BigInt> hex2PointFromCompress(String hex) {
     throw ('failed to retrieve y of public key from hex');
   }
 
-  var firstBit = int.parse(y.toRadixString(2)[0], radix: 2);
+  var firstBit = (y & BigInt.one).toInt();
   if (firstBit != (firstByte & 1)) {
     y = secp256k1.p - y;
   }
@@ -99,9 +99,8 @@ String point2Hex(List<BigInt> point) {
 }
 
 String point2HexInCompress(List<BigInt> point) {
-  // var byteLen = 32; //(256 + 7) >> 3 //  => so len of str is (32+1) * 2 = 66
-  var binY = point[1].toRadixString(2);
-  var firstBit = 2 + int.parse(binY[0]);
+  // var byteLen = 32; //(256 + 7) >> 3 //  => so len of str is (32+1) * 2 = 66;
+  var firstBit = 2 + (point[1] & BigInt.one).toInt();
   var prefix = firstBit.toRadixString(16).padLeft(2, '0');
 
   return prefix + point[0].toRadixString(16).padLeft(64, '0');

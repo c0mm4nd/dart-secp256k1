@@ -1,6 +1,6 @@
 name: secp256k1
 description: "Pure secp256k1 signature algorithm implement for dart language which uses pure dart and basic types to represent all matters"
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/c0mm4nd/dart-secp256k1
 
 environment:
