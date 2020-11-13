@@ -23,32 +23,33 @@ void main() {
     ];
 
     test('Test', () {
-      var pk1 = hexToPrivateKey(vec[0][0]);
-      var pub1 = getPublic(pk1);
-      var hexPub = publicKeyToCompressHex(pub1);
+      var pk1 = PrivateKey.fromHex(vec[0][0]);
+      var pub1 = pk1.publicKey;
+      var hexPub = pub1.toCompressedHex();
       expect(hexPub, vec[0][1]);
-      expect(compressHexToPublicKey(vec[0][1]), pub1);
+      expect(PublicKey.fromCompressedHex(vec[0][1]), pub1);
 
-      var pk2 = hexToPrivateKey(vec[1][0]);
-      var pub2 = getPublic(pk2);
-      hexPub = publicKeyToHex(pub2);
+      var pk2 = PrivateKey.fromHex(vec[1][0]);
+      var pub2 = pk2.publicKey;
+      hexPub = pub2.toHex();
       expect(hexPub, vec[1][1]);
-      expect(hexToPublicKey(vec[1][1]), pub2);
+      expect(PublicKey.fromHex(vec[1][1]), pub2);
 
       var msg = hello_world; // sha256 of 'hello world';
-      var R_S = sign(pk2, msg);
-      expect(verify(pub2, R_S, msg), true);
-      expect(verify(pub1, R_S, msg), false);
-      expect(verify(pub2, R_S, goodbye_world), false);
-      expect(verify(pub1, [BigInt.zero, BigInt.zero], hello_world), false);
+      var sig = pk2.signature(msg);
+      expect(sig.verify(pub2, msg), true);
+      expect(sig.verify(pub1, msg), false);
+      expect(sig.verify(pub2, goodbye_world), false);
+      expect(
+          Signature(BigInt.zero, BigInt.zero).verify(pub1, hello_world), false);
     });
     test('compress prefix', () {
       // add
-      var pk3 = hexToPrivateKey(vec[2][0]);
-      var pub3 = getPublic(pk3);
-      var hexPub = publicKeyToCompressHex(pub3);
+      var pk3 = PrivateKey.fromHex(vec[2][0]);
+      var pub3 = pk3.publicKey;
+      var hexPub = pub3.toCompressedHex();
       expect(hexPub, vec[2][1]);
-      expect(compressHexToPublicKey(vec[2][1]), pub3);
+      expect(PublicKey.fromCompressedHex(vec[2][1]), pub3);
     });
   });
 }
