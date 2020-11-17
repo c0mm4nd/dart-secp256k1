@@ -147,26 +147,23 @@ BigInt inverseMulti(BigInt x, BigInt modNum) {
   }
 }
 
-BigInt getPrivteKeyByRand(BigInt n) {
+BigInt getPrivKeyByRand(BigInt n) {
   var nHex = n.toRadixString(16);
   var privteKeyList = <String>[];
-  var isZero = true;
   var random = Random.secure();
 
   for (var i = 0; i < nHex.length; i++) {
-    var rand16Num =
-        BigInt.from(random.nextInt(100) / 100 * int.parse(nHex[i], radix: 16));
-    privteKeyList.add(rand16Num.toRadixString(16).padLeft(32, '0'));
-    if (rand16Num > BigInt.zero) {
-      isZero = false;
-    }
+    var rand16Num = BigInt.from(
+        (random.nextInt(100) / 100 * int.parse(nHex[i], radix: 16)).round());
+    privteKeyList.add(rand16Num.toRadixString(16));
   }
 
-  if (isZero) {
-    return getPrivteKeyByRand(n);
+  var D = BigInt.parse(privteKeyList.join(''), radix: 16);
+  if (D == BigInt.zero) {
+    return getPrivKeyByRand(n);
   }
 
-  return BigInt.parse(privteKeyList.join(''), radix: 16);
+  return D;
 }
 
 List<BigInt> addSamePoint(BigInt x1, BigInt y1, BigInt modNum, BigInt a) {
@@ -214,7 +211,7 @@ List<BigInt> sign(BigInt n, BigInt p, BigInt a, BigInt d, List<BigInt> pointG,
   var r = BigInt.zero;
 
   while (r == BigInt.zero) {
-    k = getPrivteKeyByRand(n);
+    k = getPrivKeyByRand(n);
 
     R = getPointByBig(k, p, a, pointG);
     r = postiveMod(R[0], n);

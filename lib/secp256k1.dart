@@ -18,7 +18,7 @@ class PrivateKey {
 
   /// generate a private key from random number
   PrivateKey.generate() {
-    D = base.getPrivteKeyByRand(base.secp256k1.n);
+    D = base.getPrivKeyByRand(base.secp256k1.n);
   }
 
   /// convert a hex string to a private key(bigint)
@@ -28,7 +28,7 @@ class PrivateKey {
 
   /// generate a hex string from a private key(bigint)
   String toHex() {
-    return D.toRadixString(16);
+    return D.toRadixString(16).padLeft(64, '0');
   }
 
   /// sign the **hash** of message with the private key
@@ -62,12 +62,12 @@ class PublicKey {
 
   /// generate a compressed hex string from a public key
   String toHex() {
-    return base.point2Hex([X, Y]);
+    return base.point2Hex([X, Y]).padLeft(65 * 2, '0');
   }
 
   /// generate a compressed hex string from a public key
   String toCompressedHex() {
-    return base.point2HexInCompress([X, Y]);
+    return base.point2HexInCompress([X, Y]).padLeft(33 * 2, '0');
   }
 }
 
@@ -91,6 +91,7 @@ class Signature {
   }
 
   String toHex() {
-    return R.toRadixString(16) + S.toRadixString(16);
+    return R.toRadixString(16).padLeft(64, '0') +
+        S.toRadixString(16).padLeft(64, '0');
   }
 }

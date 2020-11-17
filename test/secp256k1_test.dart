@@ -51,5 +51,14 @@ void main() {
       expect(hexPub, vec[2][1]);
       expect(PublicKey.fromCompressedHex(vec[2][1]), pub3);
     });
+    test('pk generate', () {
+      var pk = PrivateKey.generate();
+      var sig = pk.signature(hello_world);
+
+      expect(pk.toHex().length, 64);
+      expect(sig.toHex().length, 128);
+      expect(pk.publicKey.toHex().length, 130);
+      expect(pk.publicKey.toCompressedHex().length, 66);
+    });
   });
 }

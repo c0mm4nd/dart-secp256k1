@@ -1,4 +1,4 @@
-## 0.2.0
+## 0.2.1
 - Rewrite the interface in OOP
 
 ## 0.1.1
