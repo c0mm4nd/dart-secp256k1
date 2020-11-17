@@ -38,6 +38,11 @@ class PrivateKey {
 
     return Signature(rs[0], rs[1]);
   }
+
+  @override
+  bool operator ==(other) {
+    return other is PrivateKey && (D == other.D);
+  }
 }
 
 class PublicKey {
@@ -60,14 +65,24 @@ class PublicKey {
     Y = point[1];
   }
 
-  /// generate a compressed hex string from a public key
+  /// generate a hex string from a public key
   String toHex() {
-    return base.point2Hex([X, Y]).padLeft(65 * 2, '0');
+    return base.point2Hex([X, Y]);
   }
 
   /// generate a compressed hex string from a public key
   String toCompressedHex() {
-    return base.point2HexInCompress([X, Y]).padLeft(33 * 2, '0');
+    return base.point2HexInCompress([X, Y]);
+  }
+
+  @override
+  String toString() {
+    return toHex();
+  }
+
+  @override
+  bool operator ==(other) {
+    return other is PublicKey && (X == other.X && Y == other.Y);
   }
 }
 
@@ -76,6 +91,10 @@ class Signature {
   BigInt S;
 
   Signature(this.R, this.S);
+  Signature.fromHexes(String r, s) {
+    R = BigInt.parse(r, radix: 16);
+    S = BigInt.parse(s, radix: 16);
+  }
 
   /// verify the sign and the **hash** of message with the public key
   bool verify(PublicKey publicKey, String hexHash) {
@@ -90,8 +109,29 @@ class Signature {
     );
   }
 
-  String toHex() {
+  List<BigInt> toBigInts() {
+    return [R, S];
+  }
+
+  List<String> toHexes() {
+    return [
+      R.toRadixString(16).padLeft(64, '0'),
+      S.toRadixString(16).padLeft(64, '0')
+    ];
+  }
+
+  String toRawHex() {
     return R.toRadixString(16).padLeft(64, '0') +
         S.toRadixString(16).padLeft(64, '0');
+  }
+
+  @override
+  String toString() {
+    return toRawHex();
+  }
+
+  @override
+  bool operator ==(other) {
+    return other is Signature && (R == other.R && S == other.S);
   }
 }

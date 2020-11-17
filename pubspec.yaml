@@ -6,7 +6,7 @@ homepage: https://github.com/c0mm4nd/dart-secp256k1
 environment:
   sdk: '>=2.8.1 <3.0.0'
 
-#dependencies:
+dependencies:
 #  path: ^1.7.0
 
 dev_dependencies:

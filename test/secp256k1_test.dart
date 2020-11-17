@@ -1,4 +1,5 @@
 import 'package:secp256k1/secp256k1.dart';
+import 'package:secp256k1/src/base.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -56,9 +57,20 @@ void main() {
       var sig = pk.signature(hello_world);
 
       expect(pk.toHex().length, 64);
-      expect(sig.toHex().length, 128);
       expect(pk.publicKey.toHex().length, 130);
       expect(pk.publicKey.toCompressedHex().length, 66);
+    });
+    test('batch test', () {
+      for (var i = 0; i < 1000; i++) {
+        var msgHash = getPrivKeyByRand(BigInt.one).toRadixString(16);
+        var pk = PrivateKey.generate();
+        var sig = pk.signature(msgHash);
+        var pub = pk.publicKey;
+        var ok = sig.verify(pub, msgHash);
+        if (!ok) {
+          throw Error();
+        }
+      }
     });
   });
 }

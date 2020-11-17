@@ -153,8 +153,8 @@ BigInt getPrivKeyByRand(BigInt n) {
   var random = Random.secure();
 
   for (var i = 0; i < nHex.length; i++) {
-    var rand16Num = BigInt.from(
-        (random.nextInt(100) / 100 * int.parse(nHex[i], radix: 16)).round());
+    var rand16Num =
+        (random.nextInt(100) / 100 * int.parse(nHex[i], radix: 16)).round();
     privteKeyList.add(rand16Num.toRadixString(16));
   }
 
