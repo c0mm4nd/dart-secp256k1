@@ -1,4 +1,9 @@
 ## 0.2.1
+
+- Fix PrivateKey.generate()
+
+## 0.2.0
+
 - Rewrite the interface in OOP
 
 ## 0.1.1
