@@ -53,12 +53,21 @@ void main() {
       expect(PublicKey.fromCompressedHex(vec[2][1]), pub3);
     });
     test('pk generate', () {
-      var pk = PrivateKey.generate();
+      var pk = PrivateKey.fromHex(
+          'e91c15d2353314e8be46658e0071b794a2404b35a323200a1a320b5670250110');
       var sig = pk.signature(hello_world);
-
+      expect(pk.publicKey.toHex(),
+          '043d86c4708eaccc71e7c60eab06cf64b54d0d79b422c4dfac938436cdbb93db9ae613afe574d522ab2637f3f0b77ec2f211c4a526db3a7b4da1a2d1ec02a8ea9f');
+      print('PublicKey: ' +
+          pk.publicKey.X.toRadixString(16) +
+          ':' +
+          pk.publicKey.Y.toRadixString(16));
+      print(sig.toRawHex());
+      print('Sig: ' + sig.R.toRadixString(16) + ':' + sig.S.toRadixString(16));
       expect(pk.toHex().length, 64);
       expect(pk.publicKey.toHex().length, 130);
       expect(pk.publicKey.toCompressedHex().length, 66);
+      expect(sig.verify(pk.publicKey, hello_world), true);
     });
     test('batch test', () {
       for (var i = 0; i < 1000; i++) {

@@ -110,15 +110,17 @@ BigInt point2Big(List<BigInt> point) {
   return BigInt.parse(point2Hex(point), radix: 16);
 }
 
-BigInt postiveMod(BigInt n, BigInt modN) {
+BigInt positiveMod(BigInt n, BigInt modN) {
   return (n % modN + modN) % modN;
 }
 
 BigInt inverseMulti(BigInt x, BigInt modNum) {
+  // x1 * x + x2 * y = x3
   var x1 = BigInt.one;
   var x2 = BigInt.zero;
   var x3 = modNum;
 
+  // y1 * x + y2 * y = y3
   var y1 = BigInt.zero;
   var y2 = BigInt.one;
   var y3 = (x % modNum + modNum) % modNum;
@@ -167,19 +169,19 @@ BigInt getPrivKeyByRand(BigInt n) {
 }
 
 List<BigInt> addSamePoint(BigInt x1, BigInt y1, BigInt modNum, BigInt a) {
-  var ru = postiveMod(
+  var ru = positiveMod(
       (BigInt.from(3) * x1.pow(2) + a) * inverseMulti(BigInt.two * y1, modNum),
       modNum);
-  var x3 = postiveMod(ru.pow(2) - (BigInt.two * x1), modNum);
-  var y3 = postiveMod(ru * (x1 - x3) - y1, modNum);
+  var x3 = positiveMod(ru.pow(2) - (BigInt.two * x1), modNum);
+  var y3 = positiveMod(ru * (x1 - x3) - y1, modNum);
   return [x3, y3];
 }
 
 List<BigInt> addDiffPoint(
     BigInt x1, BigInt y1, BigInt x2, BigInt y2, BigInt modNum) {
-  var ru = postiveMod((y2 - y1) * inverseMulti(x2 - x1, modNum), modNum);
-  var x3 = postiveMod(ru.pow(2) - x1 - x2, modNum);
-  var y3 = postiveMod(ru * (x1 - x3) - y1, modNum);
+  var ru = positiveMod((y2 - y1) * inverseMulti(x2 - x1, modNum), modNum);
+  var x3 = positiveMod(ru.pow(2) - x1 - x2, modNum);
+  var y3 = positiveMod(ru * (x1 - x3) - y1, modNum);
   return [x3, y3];
 }
 
@@ -210,20 +212,24 @@ List<BigInt> sign(BigInt n, BigInt p, BigInt a, BigInt d, List<BigInt> pointG,
   List<BigInt> R;
   var r = BigInt.zero;
 
-  while (r == BigInt.zero) {
+  while (true) {
     k = getPrivKeyByRand(n);
+    if (k < BigInt.one || k >= n - BigInt.one) continue;
 
     R = getPointByBig(k, p, a, pointG);
-    r = postiveMod(R[0], n);
-  }
+    r = positiveMod(R[0], n);
+    if (r == BigInt.zero) continue;
 
-  var e = bigHash;
-  var s = postiveMod(((e + (r * d)) * inverseMulti(k, n)), n);
+    var e = bigHash;
+    var s = positiveMod(((e + (r * d)) * inverseMulti(k, n)), n);
 
-  if (s == BigInt.zero) {
-    return sign(n, p, a, d, pointG, bigHash);
+    // if (s == BigInt.zero) {
+    //   return sign(n, p, a, d, pointG, bigHash);
+    // }
+    if (s == BigInt.zero) continue;
+
+    return [r, s];
   }
-  return [r, s];
 }
 
 bool verify(BigInt n, BigInt p, BigInt a, List<BigInt> pointG,
@@ -231,14 +237,17 @@ bool verify(BigInt n, BigInt p, BigInt a, List<BigInt> pointG,
   var r = sign[0];
   var s = sign[1];
 
-  if (!(r > BigInt.zero && r < n && s > BigInt.zero && s < n)) {
-    return false;
-  }
+  if (r < BigInt.one || r >= n) return false;
+  if (s < BigInt.one || s >= n) return false;
+
+  // if (!(r > BigInt.one && r < n && s > BigInt.one && s < n)) {
+  //   return false;
+  // }
 
   var e = bigHash;
   var w = inverseMulti(s, n);
-  var u1 = postiveMod((e * w), n);
-  var u2 = postiveMod((r * w), n);
+  var u1 = positiveMod((e * w), n);
+  var u2 = positiveMod((r * w), n);
   var u1Point = getPointByBig(u1, p, a, pointG);
   var u2Point = getPointByBig(u2, p, a, pointQ);
 
@@ -251,7 +260,7 @@ bool verify(BigInt n, BigInt p, BigInt a, List<BigInt> pointG,
   if (pointR[0] == BigInt.zero && pointR[1] == BigInt.zero) {
     return false;
   }
-  var v = postiveMod(pointR[0], n);
+  var v = positiveMod(pointR[0], n);
   if (v == r) {
     return true;
   }
