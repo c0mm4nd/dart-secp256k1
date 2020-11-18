@@ -1,3 +1,8 @@
+## 0.2.2
+
+- add == operator
+- optimize codes
+
 ## 0.2.1
 
 - Fix PrivateKey.generate()
