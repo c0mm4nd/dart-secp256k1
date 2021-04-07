@@ -1,3 +1,7 @@
+## 0.3.0
+- implement null safety (from @andrebianchessi)
+- require dart sdk>=2.12.0
+
 ## 0.2.2
 
 - add == operator
