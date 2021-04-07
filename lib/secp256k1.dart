@@ -3,7 +3,7 @@ library secp256k1;
 import './src/base.dart' as base;
 
 class PrivateKey {
-  BigInt D;
+  late BigInt D;
 
   /// get the unique public key of the private key on secp256k1 curve
   PublicKey get publicKey {
@@ -46,8 +46,8 @@ class PrivateKey {
 }
 
 class PublicKey {
-  BigInt X;
-  BigInt Y;
+  late BigInt X;
+  late BigInt Y;
 
   PublicKey(this.X, this.Y);
 
@@ -87,8 +87,8 @@ class PublicKey {
 }
 
 class Signature {
-  BigInt R;
-  BigInt S;
+  late BigInt R;
+  late BigInt S;
 
   Signature(this.R, this.S);
   Signature.fromHexes(String r, s) {

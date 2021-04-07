@@ -14,8 +14,8 @@ const secp256k1Params = {
 };
 
 class Curve {
-  BigInt p, a, b, n, h;
-  List<BigInt> G;
+  late BigInt p, a, b, n, h;
+  late List<BigInt> G;
   Curve(Map params) {
     p = BigInt.parse(params['p'], radix: 16);
     a = BigInt.parse(params['a'], radix: 16);
@@ -23,8 +23,8 @@ class Curve {
     n = BigInt.parse(params['n'], radix: 16);
     h = BigInt.parse(params['h'], radix: 16);
     G = [
-      BigInt.parse(secp256k1Params['Gx'], radix: 16),
-      BigInt.parse(secp256k1Params['Gy'], radix: 16)
+      BigInt.parse(secp256k1Params['Gx']!, radix: 16),
+      BigInt.parse(secp256k1Params['Gy']!, radix: 16)
     ];
   }
 }
@@ -42,7 +42,7 @@ List<BigInt> big2Point(BigInt n) {
 List<BigInt> hex2Point(String hex) {
   final len = 130;
   if (hex.length != len) {
-    throw ('point length must be ${len}!');
+    throw ('point length must be $len!');
   }
 
   if (hex.substring(0, 2) != '04') {
@@ -58,7 +58,7 @@ List<BigInt> hex2Point(String hex) {
 List<BigInt> hex2PointFromCompress(String hex) {
   final len = 66;
   if (hex.length != len) {
-    throw ('point length must be ${len}!');
+    throw ('point length must be $len!');
   }
 
   var firstByte = int.parse(hex.substring(0, 2), radix: 16);
@@ -187,7 +187,7 @@ List<BigInt> addDiffPoint(
 
 List<BigInt> getPointByBig(BigInt n, BigInt p, BigInt a, List<BigInt> pointG) {
   var bin = n.toRadixString(2);
-  List<BigInt> nowPoint;
+  List<BigInt>? nowPoint;
   var nextPoint = pointG;
   for (var i = bin.length - 1; i >= 0; i--) {
     if (bin[i] == '1') {
@@ -202,7 +202,7 @@ List<BigInt> getPointByBig(BigInt n, BigInt p, BigInt a, List<BigInt> pointG) {
     nextPoint = addSamePoint(nextPoint[0], nextPoint[1], p, a);
   }
 
-  return nowPoint;
+  return nowPoint!;
 }
 
 // signRFC6979
