@@ -310,16 +310,18 @@ List<BigInt> sign(BigInt n, BigInt p, BigInt a, BigInt d, List<BigInt> pointG,
   return [r, s];
 }
 
-// isOnCurve reports whether the affine point (x, y) satisfies the secp256k1
-// curve equation y^2 = x^3 + a*x + b (mod p) and has coordinates in [0, p).
-bool isOnCurve(List<BigInt> point, BigInt p, BigInt a) {
+// isOnCurve reports whether the affine point (x, y) satisfies the curve
+// equation y^2 = x^3 + a*x + b (mod p) and has coordinates in [0, p). [b]
+// defaults to the secp256k1 constant.
+bool isOnCurve(List<BigInt> point, BigInt p, BigInt a, [BigInt? b]) {
+  b ??= secp256k1.b;
   var x = point[0];
   var y = point[1];
   if (x < BigInt.zero || x >= p || y < BigInt.zero || y >= p) {
     return false;
   }
   var lhs = (y * y) % p;
-  var rhs = (x * x % p * x + a * x + secp256k1.b) % p;
+  var rhs = (x * x % p * x + a * x + b) % p;
   return lhs == rhs;
 }
 
@@ -343,21 +345,17 @@ bool verify(BigInt n, BigInt p, BigInt a, List<BigInt> pointG,
   var w = inverseMulti(s, n);
   var u1 = positiveMod((e * w), n);
   var u2 = positiveMod((r * w), n);
-  var u1Point = getPointByBig(u1, p, a, pointG);
-  var u2Point = getPointByBig(u2, p, a, pointQ);
 
-  List<BigInt> pointR;
-  if (u1Point[0] == u2Point[0] && u1Point[1] == u2Point[1]) {
-    pointR = addSamePoint(u1Point[0], u1Point[1], p, a);
-  } else {
-    pointR = addDiffPoint(u1Point[0], u1Point[1], u2Point[0], u2Point[1], p);
-  }
-  if (pointR[0] == BigInt.zero && pointR[1] == BigInt.zero) {
-    return false;
+  // A zero scalar yields the point at infinity; combine through the
+  // infinity-aware _pointAdd so that edge cases (u1 == 0, or u1*G == -(u2*Q))
+  // return false instead of throwing from the raw affine helpers.
+  var u1Point = u1 == BigInt.zero ? null : getPointByBig(u1, p, a, pointG);
+  var u2Point = u2 == BigInt.zero ? null : getPointByBig(u2, p, a, pointQ);
+
+  var pointR = _pointAdd(u1Point, u2Point, p, a);
+  if (pointR == null) {
+    return false; // sum is the point at infinity
   }
   var v = positiveMod(pointR[0], n);
-  if (v == r) {
-    return true;
-  }
-  return false;
+  return v == r;
 }

@@ -101,5 +101,23 @@ void main() {
       var bad = PublicKey(pk.publicKey.X, pk.publicKey.Y + BigInt.one);
       expect(sig.verify(bad, hello_world), isFalse);
     });
+    test('verify returns false (no throw) when e is zero', () {
+      // bigHash == 0 makes u1 == 0 (the point at infinity); verify must return
+      // false rather than throwing from scalar multiplication.
+      var pk = PrivateKey.fromHex(vec[0][0]);
+      var zeroHash = ''.padLeft(64, '0');
+      expect(Signature(BigInt.one, BigInt.one).verify(pk.publicKey, zeroHash),
+          isFalse);
+    });
+    test('verify never throws on malformed signatures', () {
+      var pk = PrivateKey.generate();
+      var pub = pk.publicKey;
+      for (var i = 0; i < 200; i++) {
+        var r = getPrivKeyByRand(secp256k1.n);
+        var s = getPrivKeyByRand(secp256k1.n);
+        // Overwhelmingly invalid; must return false without throwing.
+        expect(Signature(r, s).verify(pub, hello_world), isFalse);
+      }
+    });
   });
 }

@@ -1,3 +1,11 @@
+## 0.4.1
+
+- Fix `verify` to combine points through the infinity-aware `_pointAdd`, so
+  malformed signatures (e.g. `e == 0`, or `u1*G == -(u2*Q)`) return `false`
+  instead of throwing from the raw affine helpers.
+- `isOnCurve` takes the curve constant `b` as an optional parameter (defaulting
+  to the secp256k1 value) instead of always using the global.
+
 ## 0.4.0
 
 - **SECURITY (critical)**: replace private-key and nonce generation. The old
