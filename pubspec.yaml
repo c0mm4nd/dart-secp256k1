@@ -4,10 +4,10 @@ version: 0.3.0
 homepage: https://github.com/c0mm4nd/dart-secp256k1
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.12.0 <4.0.0'
 
 dependencies:
-#  path: ^1.7.0
+  crypto: ^3.0.1
 
 dev_dependencies:
   pedantic: ^1.9.0
