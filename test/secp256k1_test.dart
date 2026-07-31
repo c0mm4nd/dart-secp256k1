@@ -71,7 +71,8 @@ void main() {
     });
     test('batch test', () {
       for (var i = 0; i < 1000; i++) {
-        var msgHash = getPrivKeyByRand(BigInt.one).toRadixString(16);
+        // A random 256-bit value standing in for a message hash.
+        var msgHash = PrivateKey.generate().toHex();
         var pk = PrivateKey.generate();
         var sig = pk.signature(msgHash);
         var pub = pk.publicKey;
@@ -80,6 +81,25 @@ void main() {
           throw Error();
         }
       }
+    });
+    test('rfc6979 deterministic + low-S', () {
+      var pk = PrivateKey.fromHex(
+          'd07b57eb3cd1a308b2fa04d97552f00b1d59efc0200affd1edafc98700ce3290');
+      var sig1 = pk.signature(hello_world);
+      var sig2 = pk.signature(hello_world);
+      // Deterministic nonces: signing the same message twice is identical.
+      expect(sig1, equals(sig2));
+      // Signature verifies.
+      expect(sig1.verify(pk.publicKey, hello_world), isTrue);
+      // low-S: s must be in the lower half of the group order.
+      expect(sig1.S <= (secp256k1.n >> 1), isTrue);
+    });
+    test('reject off-curve public key', () {
+      // A valid X with a Y that is not on the curve must be rejected by verify.
+      var pk = PrivateKey.fromHex(vec[0][0]);
+      var sig = pk.signature(hello_world);
+      var bad = PublicKey(pk.publicKey.X, pk.publicKey.Y + BigInt.one);
+      expect(sig.verify(bad, hello_world), isFalse);
     });
   });
 }
