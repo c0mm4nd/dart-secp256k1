@@ -1,5 +1,22 @@
 # dart-secp256k1
 
+> **⚠️ Security notice — please upgrade to ≥ 0.4.0 (important)**
+>
+> Versions **≤ 0.3.0** generated private keys and ECDSA nonces with a biased,
+> low-entropy routine. Keys produced by `PrivateKey.generate()` on those
+> versions are weaker than intended, and because the same routine produced the
+> signing nonce, a private key can in principle be recovered from a handful of
+> signatures.
+>
+> - If you only imported existing keys (`PrivateKey.fromHex`) and **never signed**
+>   with an affected version, your keys are unchanged.
+> - If you **generated** a key with this package at ≤ 0.3.0, **or signed** with
+>   any key using ≤ 0.3.0, treat that key as weak: upgrade to ≥ 0.4.0 and rotate
+>   to (move any funds to) a freshly generated key.
+>
+> 0.4.0+ samples keys uniformly from `Random.secure()` and derives nonces
+> deterministically per RFC 6979 (0.4.1 also hardens signature verification).
+
 Pure secp256k1 implement for dart language.
 
 secp256k1 refers to the parameters of the elliptic curve used in Bitcoin's public-key cryptography, and is defined in Standards for Efficient Cryptography (SEC) (Certicom Research, http://www.secg.org/sec2-v2.pdf). Currently Bitcoin uses secp256k1 with the ECDSA algorithm, though the same curve with the same public/private keys can be used in some other algorithms such as Schnorr.
